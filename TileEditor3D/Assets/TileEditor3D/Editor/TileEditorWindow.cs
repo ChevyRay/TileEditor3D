@@ -9,7 +9,7 @@ public class TileEditorWindow : EditorWindow
     public static void CreateWindow()
     {
         var type = mouseOverWindow != null ? mouseOverWindow.GetType() : null;
-        var icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Gizmos/Tilemap Icon.png");
+        var icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Gizmos/TileEditor Icon.png");
         var win = GetWindow<TileEditorWindow>("Tile Editor", true, type);
         win.titleContent = new GUIContent("Tile Editor", icon);
         win.minSize = new Vector2(170f, 0f);

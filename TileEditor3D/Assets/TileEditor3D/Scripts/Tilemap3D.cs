@@ -135,12 +135,65 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         tileLookup.TryGetValue(pos, out tile);
         return tile;
     }
+    public Tile GetTile(Vector3 pos)
+    {
+        return GetTile(new Vector3Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y), Mathf.RoundToInt(pos.z)));
+    }
 
     public void BuildLookup()
     {
         tileLookup.Clear();
         foreach (var tile in tiles)
             tileLookup[tile.pos] = tile;
+    }
+
+    public Tile3D GetSurface(Vector3 point, Vector3 normal)
+    {
+        var tile = GetTile(point - normal * 0.5f);
+        if (tile != null)
+        {
+            if (normal.x > 0.5f)
+                return tile.right;
+            else if (normal.x < -0.5f)
+                return tile.left;
+            else if (normal.z > 0.5f)
+                return tile.front;
+            else if (normal.z < -0.5f)
+                return tile.back;
+            else if (normal.y > 0.5f)
+                return tile.top;
+            else
+                return tile.bottom;
+        }
+        return null;
+    }
+
+    public Tile3D GetContactSurface(ContactPoint contact)
+    {
+        return GetSurface(contact.point, contact.normal);
+    }
+
+    public bool RaycastTile(Ray ray, float maxDistance, out RaycastHit hit, out Tile tile)
+    {
+        var coll = GetComponent<MeshCollider>();
+        if (coll.Raycast(ray, out hit, maxDistance))
+        {
+            tile = GetTile(hit.point - hit.normal * 0.5f);
+            return true;
+        }
+        tile = null;
+        return false;
+    }
+    public bool RaycastTile(Ray ray, float maxDistance, out RaycastHit hit, out Tile3D tile)
+    {
+        var coll = GetComponent<MeshCollider>();
+        if (coll.Raycast(ray, out hit, maxDistance))
+        {
+            tile = GetSurface(hit.point, hit.normal);
+            return true;
+        }
+        tile = null;
+        return false;
     }
 
 #if UNITY_EDITOR
