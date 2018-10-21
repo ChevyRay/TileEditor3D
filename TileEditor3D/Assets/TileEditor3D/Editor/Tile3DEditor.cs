@@ -109,6 +109,9 @@ public class Tile3DEditor : Editor
             texture.SetPixels32(pixels);
             texture.Apply();
             AssetDatabase.Refresh();
+
+            EditorGUIUtility.PingObject(texture);
+            EditorWindow.mouseOverWindow.ShowNotification(new GUIContent("Tiles packed."));
         }
     }
 }
