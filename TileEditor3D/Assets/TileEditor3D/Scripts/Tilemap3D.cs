@@ -287,7 +287,6 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         Gizmos.DrawLine(new Vector3(0.5f, -0.5f, z), new Vector3(0.5f, 0.5f, z));
     }
 
-    #if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
         if (!UnityEditor.EditorPrefs.GetBool("Tilemap3D_drawGrid"))
@@ -323,7 +322,6 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
                 DrawSide(ref m, tile.pos, Vector3.down);
         }
     }
-    #endif
 
     public void RemoveTile(Vector3Int pos)
     {
@@ -407,7 +405,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void ShiftBackButton()
+    void ShiftBack()
     {
         UnityEditor.Undo.RecordObject(this, "shift back");
         foreach (var tile in tiles)
@@ -416,7 +414,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void ShiftUpButton()
+    void ShiftUp()
     {
         UnityEditor.Undo.RecordObject(this, "shift up");
         foreach (var tile in tiles)
@@ -425,7 +423,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void ShiftDownButton()
+    void ShiftDown()
     {
         UnityEditor.Undo.RecordObject(this, "shift down");
         foreach (var tile in tiles)
@@ -434,7 +432,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void FlipXButton()
+    public void FlipX()
     {
         UnityEditor.Undo.RecordObject(this, "flip x");
         foreach (var tile in tiles)
@@ -443,7 +441,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void FlipZButton()
+    public void FlipZ()
     {
         UnityEditor.Undo.RecordObject(this, "flip z");
         foreach (var tile in tiles)
@@ -452,7 +450,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void ClockwiseButton()
+    public void Clockwise()
     {
         UnityEditor.Undo.RecordObject(this, "clockwise");
         var rot = Quaternion.Euler(0f, 90f, 0f);
@@ -470,7 +468,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void CounterClockwiseButton()
+    public void CounterClockwise()
     {
         UnityEditor.Undo.RecordObject(this, "counter-clockwise");
         var rot = Quaternion.Euler(0f, -90f, 0f);
@@ -488,7 +486,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void BottomCenterOriginButton()
+    public void BottomCenterOrigin()
     {
         UnityEditor.Undo.RecordObject(this, "bottom center");
 
@@ -506,7 +504,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         BuildMesh();
     }
 
-    void CenterOriginButton()
+    public void CenterOrigin()
     {
         UnityEditor.Undo.RecordObject(this, "center");
 

@@ -35,5 +35,37 @@ public class Tilemap3DEditor : Editor
 
         EditorGUILayout.LabelField("Tile Count", tilemap.tiles.Count.ToString());
         EditorGUILayout.LabelField("Triangle Count", (sideCount * 2).ToString());
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Flip X"))
+            EditorApplication.delayCall += tilemap.FlipX;
+        if (GUILayout.Button("Flip Z"))
+            EditorApplication.delayCall += tilemap.FlipZ;
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Rotate ↻"))
+            EditorApplication.delayCall += tilemap.Clockwise;
+        if (GUILayout.Button("Rotate ↺"))
+            EditorApplication.delayCall += tilemap.CounterClockwise;
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Base Center"))
+            EditorApplication.delayCall += tilemap.BottomCenterOrigin;
+        if (GUILayout.Button("Center"))
+            EditorApplication.delayCall += tilemap.CenterOrigin;
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Clear Tiles", EditorStyles.miniButton))
+        {
+            Undo.RecordObject(tilemap, "clear tiles");
+            tilemap.tiles.Clear();
+            tilemap.BuildLookup();
+            tilemap.BuildMesh();
+        }
+        EditorGUILayout.EndHorizontal();
     }
 }
