@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.U2D;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -75,6 +77,9 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     [HideInInspector]
     public Texture2D texture;
+
+    [HideInInspector]
+    public BoxCollider boxPrefab;
 
     [HideInInspector]
     public List<Tile> tiles = new List<Tile>();
@@ -247,12 +252,12 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     public void BuildMesh()
     {
-        texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Assets/Tiles.png");
+        texture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Assets/Tiles.png");
 
         var rend = GetComponent<MeshRenderer>();
         if (rend.sharedMaterial == null)
         {
-            var mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>("Assets/TileEditor3D/Assets/Tiles.mat");
+            var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/TileEditor3D/Assets/Tiles.mat");
             mat.mainTexture = texture;
             rend.material = mat;
         }
@@ -263,7 +268,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         if (filter.sharedMesh == null)
         {
             filter.sharedMesh = new Mesh();
-            filter.sharedMesh.name = "Tilemap3D Mesh";
+            filter.sharedMesh.name = "Render Mesh";
             //filter.sharedMesh.hideFlags = HideFlags.HideAndDontSave;
         }
 
@@ -271,7 +276,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         if (coll.sharedMesh == null)
         {
             coll.sharedMesh = new Mesh();
-            coll.sharedMesh.name = "Tilemap 3D Collider";
+            coll.sharedMesh.name = "Collision Mesh";
             //coll.sharedMesh.hideFlags = HideFlags.HideAndDontSave;
         }
 
@@ -395,14 +400,14 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     void OnDrawGizmosSelected()
     {
-        if (!UnityEditor.EditorPrefs.GetBool("Tilemap3D_drawGrid"))
+        if (!EditorPrefs.GetBool("Tilemap3D_drawGrid"))
             return;
 
         if (tileLookup == null)
             BuildLookup();
 
         var m = transform.localToWorldMatrix;
-        var cam = UnityEditor.SceneView.lastActiveSceneView.camera;
+        var cam = SceneView.lastActiveSceneView.camera;
         var camDir = cam.transform.forward;
 
         Gizmos.color = new Color(0f, 0f, 0f, 0.5f);
@@ -484,63 +489,18 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         }
     }
 
-    void ShiftLeft()
+    public void ShiftTiles(Vector3Int amount)
     {
-        UnityEditor.Undo.RecordObject(this, "shift left");
+        Undo.RecordObject(this, "shift left");
         foreach (var tile in tiles)
-            tile.pos += Vector3Int.left;
-        BuildLookup();
-        BuildMesh();
-    }
-
-    void ShiftRight()
-    {
-        UnityEditor.Undo.RecordObject(this, "shift right");
-        foreach (var tile in tiles)
-            tile.pos += Vector3Int.right;
-        BuildLookup();
-        BuildMesh();
-    }
-
-    void ShiftForward()
-    {
-        UnityEditor.Undo.RecordObject(this, "shift forward");
-        foreach (var tile in tiles)
-            tile.pos += new Vector3Int(0, 0, 1);
-        BuildLookup();
-        BuildMesh();
-    }
-
-    void ShiftBack()
-    {
-        UnityEditor.Undo.RecordObject(this, "shift back");
-        foreach (var tile in tiles)
-            tile.pos += new Vector3Int(0, 0, -1);
-        BuildLookup();
-        BuildMesh();
-    }
-
-    void ShiftUp()
-    {
-        UnityEditor.Undo.RecordObject(this, "shift up");
-        foreach (var tile in tiles)
-            tile.pos += Vector3Int.up;
-        BuildLookup();
-        BuildMesh();
-    }
-
-    void ShiftDown()
-    {
-        UnityEditor.Undo.RecordObject(this, "shift down");
-        foreach (var tile in tiles)
-            tile.pos += Vector3Int.down;
+            tile.pos += amount;
         BuildLookup();
         BuildMesh();
     }
 
     public void FlipX()
     {
-        UnityEditor.Undo.RecordObject(this, "flip x");
+        Undo.RecordObject(this, "flip x");
         foreach (var tile in tiles)
             tile.pos = new Vector3Int(-tile.pos.x, tile.pos.y, tile.pos.z);
         BuildLookup();
@@ -549,7 +509,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     public void FlipZ()
     {
-        UnityEditor.Undo.RecordObject(this, "flip z");
+        Undo.RecordObject(this, "flip z");
         foreach (var tile in tiles)
             tile.pos = new Vector3Int(tile.pos.x, tile.pos.y, -tile.pos.z);
         BuildLookup();
@@ -558,7 +518,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     public void Clockwise()
     {
-        UnityEditor.Undo.RecordObject(this, "clockwise");
+        Undo.RecordObject(this, "clockwise");
         var rot = Quaternion.Euler(0f, 90f, 0f);
         foreach (var tile in tiles)
         {
@@ -576,7 +536,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     public void CounterClockwise()
     {
-        UnityEditor.Undo.RecordObject(this, "counter-clockwise");
+        Undo.RecordObject(this, "counter-clockwise");
         var rot = Quaternion.Euler(0f, -90f, 0f);
         foreach (var tile in tiles)
         {
@@ -594,7 +554,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     public void BottomCenterOrigin()
     {
-        UnityEditor.Undo.RecordObject(this, "bottom center");
+        Undo.RecordObject(this, "bottom center");
 
         Vector3Int min, max;
         GetTileBounds(out min, out max);
@@ -612,7 +572,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     public void CenterOrigin()
     {
-        UnityEditor.Undo.RecordObject(this, "center");
+        Undo.RecordObject(this, "center");
 
         Vector3Int min, max;
         GetTileBounds(out min, out max);
@@ -627,6 +587,141 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
         BuildLookup();
         BuildMesh();
+    }
+
+    public struct Box : System.IEquatable<Box>
+    {
+        public Vector3Int min;
+        public Vector3Int max;
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + min.GetHashCode();
+                hash = hash * 23 + max.GetHashCode();
+                return hash;
+            }
+        }
+        public bool Equals(Box box)
+        {
+            return min == box.min && max == box.max;
+        }
+        public override bool Equals(object obj)
+        {
+            return obj is Box && Equals((Box)obj);
+        }
+        public static bool operator ==(Box a, Box b)
+        {
+            return a.min == b.min && a.max == b.max;
+        }
+        public static bool operator !=(Box a, Box b)
+        {
+            return a.min != b.min || a.max == b.max;
+        }
+    }
+
+    readonly static HashSet<Vector3Int> used = new HashSet<Vector3Int>();
+    static bool CanUseTile(Vector3Int p, System.Func<Vector3Int, bool> canUse)
+    {
+        return !used.Contains(p) && canUse(p);
+    }
+    static void ReduceTiles(Vector3Int min, Vector3Int max, System.Func<Vector3Int, bool> canUse, System.Action<Box> onBox)
+    {
+        //Greedy algorithm to reduce solids into fewer boxes
+        used.Clear();
+        int y1 = min.y;
+        while (y1 <= max.y)
+        {
+            int z1 = min.z;
+            while (z1 <= max.z)
+            {
+                int x1 = min.x;
+                while (x1 <= max.x)
+                {
+                    var p1 = new Vector3Int(x1, y1, z1);
+
+                    //If we find a box
+                    if (CanUseTile(p1, canUse))
+                    {
+                        //Stretch the box on the x-axis
+                        int x2 = x1;
+                        while (x2 + 1 <= max.x && CanUseTile(new Vector3Int(x2 + 1, y1, z1), canUse))
+                            ++x2;
+
+                        //Stretch the box on the z-axis
+                        int z2 = z1;
+                        while (z2 + 1 <= max.z)
+                        {
+                            bool use = true;
+                            for (int x = x1; use && x <= x2; ++x)
+                                use = CanUseTile(new Vector3Int(x, y1, z2 + 1), canUse);
+                            if (!use)
+                                break;
+                            ++z2;
+                        }
+
+                        //Stretch the box on the y-axis
+                        int y2 = y1;
+                        while (y2 + 1 <= max.y)
+                        {
+                            bool use = true;
+                            for (int x = x1; use && x <= x2; ++x)
+                                for (int z = z1; use && z <= z2; ++z)
+                                    use = CanUseTile(new Vector3Int(x, y2 + 1, z), canUse);
+                            if (!use)
+                                break;
+                            ++y2;
+                        }
+
+                        //Prevent future passes from using the tiles under this box
+                        for (int y = y1; y <= y2; ++y)
+                            for (int x = x1; x <= x2; ++x)
+                                for (int z = z1; z <= z2; ++z)
+                                    used.Add(new Vector3Int(x, y, z));
+
+                        //Create the collider for this box
+                        Box box;
+                        box.min = new Vector3Int(x1, y1, z1);
+                        box.max = new Vector3Int(x2, y2, z2);
+                        onBox(box);
+                    }
+                    ++x1;
+                }
+                ++z1;
+            }
+            ++y1;
+        }
+        used.Clear();
+    }
+
+    public void CreateBoxColliders()
+    {
+        BuildLookup();
+
+        ClearBoxColliders();
+
+        Vector3Int min, max;
+        GetTileBounds(out min, out max);
+
+        var boxes = new List<Box>();
+        ReduceTiles(min, max, p => GetTile(p) != null, boxes.Add);
+
+        foreach (var box in boxes)
+        {
+            var coll = Instantiate(boxPrefab);
+            coll.transform.parent = transform;
+            coll.transform.localPosition = Vector3.Lerp(box.min, box.max, 0.5f);
+            coll.size = (box.max + Vector3Int.one) - box.min;
+            Undo.RegisterCreatedObjectUndo(coll.gameObject, "hitbox created");
+        }
+    }
+
+    public void ClearBoxColliders()
+    {
+        foreach (var coll in transform.GetComponentsInChildren<BoxCollider>(true))
+            if (coll.transform.parent == transform)
+                Undo.DestroyObjectImmediate(coll.gameObject);
     }
 
 #endif
