@@ -9,15 +9,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 200aebe0337b54629888ddcdbd5a0661, type: 3}
-  m_Name: GrassSideTop
+  m_Name: GrassSide
   m_EditorClassIdentifier: 
-  texture: {fileID: 2800000, guid: 4ff24285ec5bc4307af9550c8df07268, type: 3}
-  normals: {fileID: 2800000, guid: bc9438632398548b497aee800897c6df, type: 3}
+  texture: {fileID: 2800000, guid: a2b0a70c8f7e444c190334c5558d2fb2, type: 3}
   data: {fileID: 0}
-  id: 2
   rect:
     serializedVersion: 2
-    x: 19
+    x: 1
     y: 1
     width: 16
     height: 16

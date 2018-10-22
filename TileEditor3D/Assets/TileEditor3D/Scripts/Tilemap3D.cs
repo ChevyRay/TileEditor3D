@@ -710,6 +710,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         foreach (var box in boxes)
         {
             var coll = Instantiate(boxPrefab);
+            coll.gameObject.name = boxPrefab.name;
             coll.transform.parent = transform;
             coll.transform.localPosition = Vector3.Lerp(box.min, box.max, 0.5f);
             coll.size = (box.max + Vector3Int.one) - box.min;
