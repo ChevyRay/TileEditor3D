@@ -9,8 +9,5 @@ public class Tile3D : ScriptableObject
     public ScriptableObject data;
 
     [HideInInspector]
-    public int id;
-
-    [HideInInspector]
     public Rect rect;
 }

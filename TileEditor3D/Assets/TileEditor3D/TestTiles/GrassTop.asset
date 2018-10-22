@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Name: GrassTop
   m_EditorClassIdentifier: 
   texture: {fileID: 2800000, guid: fc88d3ba4f39f42ddbd2fa31bc360385, type: 3}
+  normals: {fileID: 2800000, guid: 891d6afd8026e4b4081b8e076fbda171, type: 3}
+  data: {fileID: 0}
   id: 3
   rect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
+    x: 37
+    y: 1
+    width: 16
+    height: 16

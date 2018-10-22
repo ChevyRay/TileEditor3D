@@ -58,8 +58,16 @@ public class Tilemap3DEditor : Editor
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("Clear Tiles", EditorStyles.miniButton))
+        if (GUILayout.Button("Create Duplicate"))
+        {
+            var dupe = Instantiate(tilemap);
+            dupe.GetComponent<MeshFilter>().mesh = null;
+            dupe.GetComponent<MeshCollider>().sharedMesh = null;
+            dupe.BuildLookup();
+            dupe.BuildMesh();
+            Undo.RegisterCreatedObjectUndo(dupe.gameObject, "create duplicate");
+        }
+        if (GUILayout.Button("Clear Tiles"))
         {
             Undo.RecordObject(tilemap, "clear tiles");
             tilemap.tiles.Clear();

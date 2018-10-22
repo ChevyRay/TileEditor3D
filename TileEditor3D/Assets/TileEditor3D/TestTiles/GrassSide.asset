@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Name: GrassSide
   m_EditorClassIdentifier: 
   texture: {fileID: 2800000, guid: a2b0a70c8f7e444c190334c5558d2fb2, type: 3}
+  normals: {fileID: 2800000, guid: 8eec6c7b75dde40489b32ccd08bbd5dc, type: 3}
+  data: {fileID: 0}
   id: 1
   rect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
+    x: 1
+    y: 1
+    width: 16
+    height: 16

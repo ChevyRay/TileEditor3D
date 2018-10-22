@@ -6,6 +6,7 @@ using UnityEngine.U2D;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
+[ExecuteInEditMode]
 public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 {
     static List<Vector3> rendVerts = new List<Vector3>();
@@ -80,43 +81,9 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     Dictionary<Vector3Int, Tile> tileLookup = new Dictionary<Vector3Int, Tile>();
 
-    void AddVerts(Tile tile, Tile3D t3, float w, float h, int rot, Vector3 nor,
-                 float x0, float y0, float z0,
-                 float x1, float y1, float z1,
-                 float x2, float y2, float z2,
-                 float x3, float y3, float z3,
-                 int i0, int i1, int i2,
-                 int i3, int i4, int i5)
+    void Awake()
     {
-        var p = tile.pos;
-        if (t3 != null)
-        {
-            int i = rendVerts.Count;
-            rendVerts.Add(new Vector3(p.x + x0, p.y + y0, p.z + z0));
-            rendVerts.Add(new Vector3(p.x + x1, p.y + y1, p.z + z1));
-            rendVerts.Add(new Vector3(p.x + x2, p.y + y2, p.z + z2));
-            rendVerts.Add(new Vector3(p.x + x3, p.y + y3, p.z + z3));
-            var r = t3.rect;
-
-            rotUVs[0] = new Vector2(r.xMin / w, r.yMin / h);
-            rotUVs[1] = new Vector2(r.xMax / w, r.yMin / h);
-            rotUVs[2] = new Vector2(r.xMax / w, r.yMax / h);
-            rotUVs[3] = new Vector2(r.xMin / w, r.yMax / h);
-            for (int j = 0; j < 4; ++j)
-                rendUVs.Add(rotUVs[(j + rot) % 4]);
-
-            rendTris.Add(i + i0); rendTris.Add(i + i1); rendTris.Add(i + i2);
-            rendTris.Add(i + i3); rendTris.Add(i + i4); rendTris.Add(i + i5);
-        }
-        {
-            int i = collVerts.Count;
-            collVerts.Add(new Vector3(p.x + x0, p.y + y0, p.z + z0));
-            collVerts.Add(new Vector3(p.x + x1, p.y + y1, p.z + z1));
-            collVerts.Add(new Vector3(p.x + x2, p.y + y2, p.z + z2));
-            collVerts.Add(new Vector3(p.x + x3, p.y + y3, p.z + z3));
-            collTris.Add(i + i0); collTris.Add(i + i1); collTris.Add(i + i2);
-            collTris.Add(i + i3); collTris.Add(i + i4); collTris.Add(i + i5);
-        }
+        UpdateUVs();
     }
 
     public void OnBeforeSerialize()
@@ -196,15 +163,101 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         return false;
     }
 
+    void UpdateUVs(Tile tile, Tile3D t3, float w, float h, int rot)
+    {
+        var r = t3.rect;
+        rotUVs[0] = new Vector2(r.xMin / w, r.yMin / h);
+        rotUVs[1] = new Vector2(r.xMax / w, r.yMin / h);
+        rotUVs[2] = new Vector2(r.xMax / w, r.yMax / h);
+        rotUVs[3] = new Vector2(r.xMin / w, r.yMax / h);
+        for (int j = 0; j < 4; ++j)
+            rendUVs.Add(rotUVs[(j + rot) % 4]);
+    }
+    public void UpdateUVs()
+    {
+        var filter = GetComponent<MeshFilter>();
+
+        if (texture != null || filter.sharedMesh == null)
+            return;
+
+        rendUVs.Clear();
+        float w = texture.width;
+        float h = texture.height;
+        foreach (var tile in tiles)
+        {
+            var p = tile.pos;
+            if (tile.top != null && !tileLookup.ContainsKey(p + new Vector3Int(0, 1, 0)))
+                UpdateUVs(tile, tile.top, w, h, tile.rotTop);
+            if (tile.bottom != null && !tileLookup.ContainsKey(p + new Vector3Int(0, -1, 0)))
+                UpdateUVs(tile, tile.bottom, w, h, tile.rotBottom);
+            if (tile.front != null && !tileLookup.ContainsKey(p + new Vector3Int(0, 0, 1)))
+                UpdateUVs(tile, tile.front, w, h, tile.rotFront);
+            if (tile.back != null && !tileLookup.ContainsKey(p + new Vector3Int(0, 0, -1)))
+                UpdateUVs(tile, tile.back, w, h, tile.rotBack);
+            if (tile.right != null && !tileLookup.ContainsKey(p + new Vector3Int(1, 0, 0)))
+                UpdateUVs(tile, tile.right, w, h, tile.rotRight);
+            if (tile.left != null && !tileLookup.ContainsKey(p + new Vector3Int(-1, 0, 0)))
+                UpdateUVs(tile, tile.left, w, h, tile.rotLeft);
+        }
+
+        filter.sharedMesh.SetUVs(0, rendUVs);
+        filter.mesh = filter.sharedMesh;
+    }
+
 #if UNITY_EDITOR
+
+    void AddVerts(Tile tile, Tile3D t3, float w, float h, int rot, Vector3 nor,
+                  float x0, float y0, float z0,
+                  float x1, float y1, float z1,
+                  float x2, float y2, float z2,
+                  float x3, float y3, float z3,
+                  int i0, int i1, int i2,
+                  int i3, int i4, int i5)
+    {
+        var p = tile.pos;
+        if (t3 != null)
+        {
+            int i = rendVerts.Count;
+            rendVerts.Add(new Vector3(p.x + x0, p.y + y0, p.z + z0));
+            rendVerts.Add(new Vector3(p.x + x1, p.y + y1, p.z + z1));
+            rendVerts.Add(new Vector3(p.x + x2, p.y + y2, p.z + z2));
+            rendVerts.Add(new Vector3(p.x + x3, p.y + y3, p.z + z3));
+            var r = t3.rect;
+
+            rotUVs[0] = new Vector2(r.xMin / w, r.yMin / h);
+            rotUVs[1] = new Vector2(r.xMax / w, r.yMin / h);
+            rotUVs[2] = new Vector2(r.xMax / w, r.yMax / h);
+            rotUVs[3] = new Vector2(r.xMin / w, r.yMax / h);
+            for (int j = 0; j < 4; ++j)
+                rendUVs.Add(rotUVs[(j + rot) % 4]);
+
+            rendTris.Add(i + i0); rendTris.Add(i + i1); rendTris.Add(i + i2);
+            rendTris.Add(i + i3); rendTris.Add(i + i4); rendTris.Add(i + i5);
+        }
+        {
+            int i = collVerts.Count;
+            collVerts.Add(new Vector3(p.x + x0, p.y + y0, p.z + z0));
+            collVerts.Add(new Vector3(p.x + x1, p.y + y1, p.z + z1));
+            collVerts.Add(new Vector3(p.x + x2, p.y + y2, p.z + z2));
+            collVerts.Add(new Vector3(p.x + x3, p.y + y3, p.z + z3));
+            collTris.Add(i + i0); collTris.Add(i + i1); collTris.Add(i + i2);
+            collTris.Add(i + i3); collTris.Add(i + i4); collTris.Add(i + i5);
+        }
+    }
+
     public void BuildMesh()
     {
-        var mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>("Assets/TileEditor3D/Assets/Tiles.mat");
         texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Assets/Tiles.png");
-        var rend = GetComponent<MeshRenderer>();
-        rend.material = mat;
 
-        var tex = mat.mainTexture = texture;
+        var rend = GetComponent<MeshRenderer>();
+        if (rend.sharedMaterial == null)
+        {
+            var mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>("Assets/TileEditor3D/Assets/Tiles.mat");
+            mat.mainTexture = texture;
+            rend.material = mat;
+        }
+
+        var tex = texture;
 
         var filter = GetComponent<MeshFilter>();
         if (filter.sharedMesh == null)
