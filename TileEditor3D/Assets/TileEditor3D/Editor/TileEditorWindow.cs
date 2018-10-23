@@ -9,7 +9,7 @@ public class TileEditorWindow : EditorWindow
     public static void CreateWindow()
     {
         var type = mouseOverWindow != null ? mouseOverWindow.GetType() : null;
-        var icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Gizmos/TileEditor Icon.png");
+        var icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Gizmos/TileEditor Icon.png");
         var win = GetWindow<TileEditorWindow>("Tile Editor", true, type);
         win.titleContent = new GUIContent("Tile Editor", icon);
         win.minSize = new Vector2(170f, 0f);
@@ -141,9 +141,9 @@ public class TileEditorWindow : EditorWindow
             return;
         }
 
-        var noneIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Gizmos/TileNone Icon.png");
-        var blockIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Gizmos/TileBlock Icon.png");
-        var paintIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Gizmos/TilePaint Icon.png");
+        var noneIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Gizmos/TileNone Icon.png");
+        var blockIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Gizmos/TileBlock Icon.png");
+        var paintIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Gizmos/TilePaint Icon.png");
 
         EditorGUILayout.BeginHorizontal();
         GUI.enabled = editMode != EditMode.None;
