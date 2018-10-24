@@ -7,17 +7,7 @@ public class Tile3DEditor : Editor
     [MenuItem("Assets/Create/Tile3D", priority = 101)]
     static void CreateTile3D()
     {
-        /*int maxID = 0;
-        var guids = AssetDatabase.FindAssets("t:Tile3D");
-        foreach (var guid in guids)
-        {
-            var t = AssetDatabase.LoadAssetAtPath<Tile3D>(AssetDatabase.GUIDToAssetPath(guid));
-            if (t != null)
-                maxID = Mathf.Max(maxID, t.id);
-        }*/
-
         var tile = CreateInstance<Tile3D>();
-        //tile.id = maxID + 1;
 
         string path;
         string name = "Tile3D";

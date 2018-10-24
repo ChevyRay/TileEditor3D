@@ -84,6 +84,9 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
     [HideInInspector]
     public List<Tile> tiles = new List<Tile>();
 
+    [HideInInspector]
+    public int subdivisions;
+
     Dictionary<Vector3Int, Tile> tileLookup = new Dictionary<Vector3Int, Tile>();
 
     void Awake()
@@ -168,6 +171,29 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         return false;
     }
 
+    void UpdateUVs(int sub, Vector2 a, Vector2 c, Vector2 e, Vector2 g)
+    {
+        if (sub > 0)
+        {
+            --sub;
+            var b = Vector2.Lerp(a, c, 0.5f);
+            var d = Vector2.Lerp(c, e, 0.5f);
+            var f = Vector2.Lerp(e, g, 0.5f);
+            var h = Vector2.Lerp(g, a, 0.5f);
+            var m = Vector2.Lerp(a, e, 0.5f);
+            UpdateUVs(sub, a, b, m, h);
+            UpdateUVs(sub, b, c, d, m);
+            UpdateUVs(sub, m, d, e, f);
+            UpdateUVs(sub, h, m, f, g);
+        }
+        else
+        {
+            rendUVs.Add(a);
+            rendUVs.Add(c);
+            rendUVs.Add(e);
+            rendUVs.Add(g);
+        }
+    }
     void UpdateUVs(Tile tile, Tile3D t3, float w, float h, int rot)
     {
         var r = t3.rect;
@@ -175,14 +201,13 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         rotUVs[1] = new Vector2(r.xMax / w, r.yMin / h);
         rotUVs[2] = new Vector2(r.xMax / w, r.yMax / h);
         rotUVs[3] = new Vector2(r.xMin / w, r.yMax / h);
-        for (int j = 0; j < 4; ++j)
-            rendUVs.Add(rotUVs[(j + rot) % 4]);
+        UpdateUVs(subdivisions, rotUVs[rot % 4], rotUVs[(rot + 1) % 4], rotUVs[(rot + 2) % 4], rotUVs[(rot + 3) % 4]);
     }
     public void UpdateUVs()
     {
         var filter = GetComponent<MeshFilter>();
 
-        if (texture != null || filter.sharedMesh == null)
+        if (texture == null || filter.sharedMesh == null)
             return;
 
         rendUVs.Clear();
@@ -206,6 +231,7 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         }
 
         filter.sharedMesh.SetUVs(0, rendUVs);
+        filter.sharedMesh.UploadMeshData(Application.isPlaying);
         filter.mesh = filter.sharedMesh;
     }
 
@@ -252,6 +278,8 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
 
     public void BuildMesh()
     {
+        subdivisions = 0;
+
         texture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/TileEditor3D/Assets/Tiles.png");
 
         var rend = GetComponent<MeshRenderer>();
@@ -799,6 +827,10 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
         var pos = transform.localPosition;
         transform.localPosition += Vector3.one;
         transform.localPosition = pos;
+
+        Undo.RecordObject(this, "subdivide");
+
+        ++subdivisions;
     }
 
 #endif

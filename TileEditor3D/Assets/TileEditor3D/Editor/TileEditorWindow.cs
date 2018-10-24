@@ -86,8 +86,7 @@ public class TileEditorWindow : EditorWindow
             editMode = EditMode.None;
             return;
         }
-        tilemap.BuildLookup();
-        tilemap.BuildMesh();
+        BuildAndRetainSubdivisions();
     }
 
     void SetEditMode(EditMode mode)
@@ -639,5 +638,14 @@ public class TileEditorWindow : EditorWindow
                 return null;
             return Selection.activeGameObject.GetComponent<Tilemap3D>();
         }
+    }
+
+    void BuildAndRetainSubdivisions()
+    {
+        int sub = tilemap.subdivisions;
+        tilemap.BuildLookup();
+        tilemap.BuildMesh();
+        for (int i = 0; i < sub; ++i)
+            tilemap.SubdivideMesh();
     }
 }

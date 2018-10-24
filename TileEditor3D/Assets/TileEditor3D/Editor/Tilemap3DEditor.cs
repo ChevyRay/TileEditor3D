@@ -49,6 +49,8 @@ public class Tilemap3DEditor : Editor
         GUILayout.Label((vertCount * 2).ToString(), EditorStyles.miniLabel);
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.LabelField("Subdivisions", tilemap.subdivisions.ToString());
+
         if (PrefabUtility.GetPrefabType(tilemap.gameObject) == PrefabType.Prefab)
             return;
 

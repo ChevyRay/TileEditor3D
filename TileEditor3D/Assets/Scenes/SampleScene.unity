@@ -1446,6 +1446,7 @@ MonoBehaviour:
     front: {fileID: 11400000, guid: cda989e65b3954fda95b9c17659be7ba, type: 2}
     back: {fileID: 11400000, guid: cda989e65b3954fda95b9c17659be7ba, type: 2}
     rotFlags: 0
+  subdivisions: 1
 --- !u!64 &571141852
 MeshCollider:
   m_ObjectHideFlags: 0
