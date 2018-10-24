@@ -38,8 +38,16 @@ public class Tilemap3DEditor : Editor
             if (tile.bottom != null && tilemap.GetTile(tile.pos + new Vector3Int(0, -1, 0)) == null) ++sideCount;
         }
 
-        EditorGUILayout.LabelField("Tile Count", tilemap.tiles.Count.ToString());
-        EditorGUILayout.LabelField("Triangle Count", (sideCount * 2).ToString());
+        EditorGUILayout.BeginHorizontal();
+        var rendMesh = tilemap.GetComponent<MeshFilter>().sharedMesh;
+        int vertCount = rendMesh != null ? rendMesh.vertexCount : 0;
+        GUILayout.Label("Tiles:", EditorStyles.miniLabel);
+        GUILayout.Label(tilemap.tiles.Count.ToString(), EditorStyles.miniLabel);
+        GUILayout.Label("Vertices:", EditorStyles.miniLabel);
+        GUILayout.Label(vertCount.ToString(), EditorStyles.miniLabel);
+        GUILayout.Label("Triangles:", EditorStyles.miniLabel);
+        GUILayout.Label((vertCount * 2).ToString(), EditorStyles.miniLabel);
+        EditorGUILayout.EndHorizontal();
 
         if (PrefabUtility.GetPrefabType(tilemap.gameObject) == PrefabType.Prefab)
             return;
