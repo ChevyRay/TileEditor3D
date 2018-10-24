@@ -725,5 +725,81 @@ public class Tilemap3D : MonoBehaviour, ISerializationCallbackReceiver
                 Undo.DestroyObjectImmediate(coll.gameObject);
     }
 
+    public void SubdivideMesh()
+    {
+        var mesh = GetComponent<MeshFilter>().sharedMesh;
+
+        var meshVerts = mesh.vertices;
+        var meshUVs = mesh.uv;
+        var meshTris = mesh.triangles;
+
+        rendVerts.Clear();
+        rendUVs.Clear();
+        rendTris.Clear();
+
+        for (int i = 0; i < meshVerts.Length; i += 4)
+        {
+            var a = meshVerts[i]; var au = meshUVs[i];
+            var c = meshVerts[i + 1]; var cu = meshUVs[i + 1];
+            var e = meshVerts[i + 2]; var eu = meshUVs[i + 2];
+            var g = meshVerts[i + 3]; var gu = meshUVs[i + 3];
+            var b = Vector3.Lerp(a, c, 0.5f); var bu = Vector2.Lerp(au, cu, 0.5f);
+            var d = Vector3.Lerp(c, e, 0.5f); var du = Vector2.Lerp(cu, eu, 0.5f);
+            var f = Vector3.Lerp(e, g, 0.5f); var fu = Vector2.Lerp(eu, gu, 0.5f);
+            var h = Vector3.Lerp(g, a, 0.5f); var hu = Vector2.Lerp(gu, au, 0.5f);
+            var m = Vector3.Lerp(a, e, 0.5f); var mu = Vector2.Lerp(au, eu, 0.5f);
+
+            int t = rendVerts.Count;
+            rendTris.Add(t + 2); rendTris.Add(t + 1); rendTris.Add(t);
+            rendTris.Add(t + 3); rendTris.Add(t + 2); rendTris.Add(t);
+
+            rendVerts.Add(a); rendUVs.Add(au);
+            rendVerts.Add(b); rendUVs.Add(bu);
+            rendVerts.Add(m); rendUVs.Add(mu);
+            rendVerts.Add(h); rendUVs.Add(hu);
+
+            t = rendVerts.Count;
+            rendTris.Add(t + 2); rendTris.Add(t + 1); rendTris.Add(t);
+            rendTris.Add(t + 3); rendTris.Add(t + 2); rendTris.Add(t);
+
+            rendVerts.Add(b); rendUVs.Add(bu);
+            rendVerts.Add(c); rendUVs.Add(cu);
+            rendVerts.Add(d); rendUVs.Add(du);
+            rendVerts.Add(m); rendUVs.Add(mu);
+
+            t = rendVerts.Count;
+            rendTris.Add(t + 2); rendTris.Add(t + 1); rendTris.Add(t);
+            rendTris.Add(t + 3); rendTris.Add(t + 2); rendTris.Add(t);
+
+            rendVerts.Add(m); rendUVs.Add(mu);
+            rendVerts.Add(d); rendUVs.Add(du);
+            rendVerts.Add(e); rendUVs.Add(eu);
+            rendVerts.Add(f); rendUVs.Add(fu);
+
+            t = rendVerts.Count;
+            rendTris.Add(t + 2); rendTris.Add(t + 1); rendTris.Add(t);
+            rendTris.Add(t + 3); rendTris.Add(t + 2); rendTris.Add(t);
+
+            rendVerts.Add(h); rendUVs.Add(hu);
+            rendVerts.Add(m); rendUVs.Add(mu);
+            rendVerts.Add(f); rendUVs.Add(fu);
+            rendVerts.Add(g); rendUVs.Add(gu);
+        }
+
+        mesh.SetVertices(rendVerts);
+        mesh.SetUVs(0, rendUVs);
+        mesh.SetTriangles(rendTris, 0);
+        mesh.UploadMeshData(false);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+
+        GetComponent<MeshFilter>().mesh = mesh;
+
+        var pos = transform.localPosition;
+        transform.localPosition += Vector3.one;
+        transform.localPosition = pos;
+    }
+
 #endif
 }

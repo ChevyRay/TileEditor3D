@@ -114,11 +114,21 @@ public class Tilemap3DEditor : Editor
             tilemap.ClearBoxColliders();
         EditorGUILayout.EndHorizontal();
 
-        if (GUILayout.Button("Rebuild Mesh", EditorStyles.miniButton))
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Rebuild Mesh", EditorStyles.miniButtonLeft))
         {
             tilemap.BuildLookup();
             tilemap.BuildMesh();
         }
+        var sm = tilemap.GetComponent<MeshFilter>().sharedMesh;
+        GUI.enabled = sm != null && sm.vertexCount > 0;
+        if (GUILayout.Button("Subdivide Mesh", EditorStyles.miniButtonRight))
+        {
+            tilemap.BuildLookup();
+            tilemap.SubdivideMesh();
+        }
+        GUI.enabled = true;
+        EditorGUILayout.EndHorizontal();
     }
 
     static void BuildPrefab(GameObject prefab, GameObject inst)
